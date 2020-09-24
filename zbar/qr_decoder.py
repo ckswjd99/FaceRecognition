@@ -1,3 +1,4 @@
+#pip install opencv-python
 import pyzbar.pyzbar as pyzbar
 import cv2
 
@@ -15,7 +16,7 @@ def qr_decoder(img):
         data.append(d.data.decode('utf-8'))
     return data
 
-test_img = cv2.imread('img/test16.png')
+test_img = cv2.imread('result.png')
 test_img_reverse = cv2.bitwise_not(test_img)
 
-print(qr_decoder(test_img))
+print(qr_decoder(test_img_reverse))
