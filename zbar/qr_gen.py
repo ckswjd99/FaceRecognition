@@ -161,4 +161,4 @@ def qr_encrypt(img, enc):
 
     return new_img
 
-qr = qr_gen("hello")
+qr = qr_gen("!893ASDoDlnd@fo$DSi23Dqr23#a12asdf4sdf6d3h5hnc6alFASDdfn!$")

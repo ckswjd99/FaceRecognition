@@ -54,8 +54,8 @@ def qr_reader(img):
 
 def qr_decoder(img, enc):
     new_img = copy.deepcopy(img)
-    GaussianBlur = ImageFilter.GaussianBlur(3)
-    new_img = new_img.filter(GaussianBlur)
+    #GaussianBlur = ImageFilter.GaussianBlur(3)
+    #new_img = new_img.filter(GaussianBlur)
     if enc == "":
         pass
     elif enc == "RED_SHUFFLE" or enc == "RED_BSHUFFLE":
@@ -94,7 +94,7 @@ def qr_decoder(img, enc):
         for i in range(img.size[0]):
             for j in range(img.size[1]):
                 pixel = np.array(new_img.getpixel((i, j)))
-                ycm = tuple(np.array(transform_vector(tuple(pixel), basis)).astype(int))
+                ycm = tuple(np.array(transform_vector(tuple(pixel*2-255), basis)).astype(int))
                 new_img.putpixel((i,j), (ycm[0], ycm[0], ycm[0]))
         new_img = PIL.ImageOps.invert(new_img)
         pass
