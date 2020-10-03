@@ -133,20 +133,21 @@ def qr_encrypt(img, enc):
         norm = np.linalg.norm(np.array([1,1]))
         basis = random_onbasis()
         print(basis)
+        adjust = 220
         for i in range(round(new_img.size[0]/10)):
             for j in range(round(new_img.size[1]/10)):
                 r, g, b = new_img.getpixel((i*10, j*10))
                 if (r, g, b) == (0, 0, 0):
-                    new_pixel = np.array(invtransform_vector((255, random.randint(0,255), random.randint(0,255)), (basis)))
-                    new_pixel = new_pixel / np.max(new_pixel) * 255
-                    new_pixel = new_pixel / 2 + 127
+                    new_pixel = np.array(invtransform_vector((127, random.randint(-127,127), random.randint(-127,127)), (basis)))
+                    new_pixel = new_pixel / adjust * 127
+                    new_pixel = new_pixel + 127
                     new_pixel = new_pixel.astype(int)
                     
                     for k in range(100):
                         new_img.putpixel((i*10+int(k/10),j*10+k%10), tuple(new_pixel))
                 else:
-                    new_pixel = np.array(invtransform_vector((0, random.randint(0,255), random.randint(0,255)), (basis)))
-                    new_pixel = new_pixel / np.max(new_pixel) * 255
+                    new_pixel = np.array(invtransform_vector((-127, random.randint(-127,127), random.randint(-127,127)), (basis)))
+                    new_pixel = new_pixel / adjust * 255
                     new_pixel = new_pixel / 2 + 127
                     new_pixel = new_pixel.astype(int)
 
@@ -161,4 +162,4 @@ def qr_encrypt(img, enc):
 
     return new_img
 
-qr = qr_gen("!893ASDoDlnd@fo$DSi23Dqr23#a12asdf4sdf6d3h5hnc6alFASDdfn!$")
+qr = qr_gen("!qi23/DUTBlaSDFG+*2^sdnfB042*@0hDVB9MHzSdf##xf9*/0n9j5%MFMqm;n")
