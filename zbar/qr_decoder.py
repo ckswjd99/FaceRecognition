@@ -4,10 +4,12 @@ import pyzbar.pyzbar as pyzbar
 import matplotlib.pylab as plt
 from PIL import Image
 from PIL import ImageFilter
+from PIL import ImageEnhance
 import PIL.ImageOps
 import numpy as np
 
 key_vector = np.array([1,0,0])
+key_basis = [np.array([1,1,0]), np.array([0,1,1]), np.array([1,0,1])]
 
 def onbasis(seed_vector):
     e1 = np.array([1,0,0])
@@ -54,7 +56,7 @@ def qr_reader(img):
 
 def qr_decoder(img, enc):
     new_img = copy.deepcopy(img)
-    GaussianBlur = ImageFilter.GaussianBlur(2)
+    GaussianBlur = ImageFilter.GaussianBlur(1)
     new_img = new_img.filter(GaussianBlur)
     if enc == "":
         pass
@@ -88,7 +90,7 @@ def qr_decoder(img, enc):
                 new_img.putpixel((i,j), (ycm[0], ycm[0], ycm[0]))
         new_img = PIL.ImageOps.invert(new_img)
         pass
-    elif enc == "VECTOR_BSHUFFLE":
+    elif enc == "ONVECTOR_BSHUFFLE":
         norm = np.linalg.norm(np.array([1,1]))
         basis = onbasis(key_vector)
         adjust = 100
@@ -102,13 +104,31 @@ def qr_decoder(img, enc):
                 new_img.putpixel((i,j), (pixel[0], pixel[0], pixel[0]))
         new_img = PIL.ImageOps.invert(new_img)
         pass
+    elif enc == "NVECTOR_BSHUFFLE":
+        basis = np.array([key_basis[0], key_basis[1], key_basis[2]]).T
+        adjust = 220
+        print(basis)
+        for i in range(img.size[0]):
+            for j in range(img.size[1]):
+                pixel = np.array(new_img.getpixel((i, j)))
+                pixel = pixel - np.array((127, 127, 127))
+                pixel = np.linalg.solve(basis, pixel)
+                pixel = pixel + np.array((127, 127, 127))
+                pixel = pixel / 127 * adjust
+                pixel = pixel.astype(int)
+                new_img.putpixel((i,j), (pixel[0], pixel[0], pixel[0]))
+        new_img = PIL.ImageOps.invert(new_img)
+        pass
     
+    #new_img = ImageEnhance.Contrast(new_img).enhance(2)
+
     print("Decoded!")
     new_img.save("decoding.png")
     return new_img
 
 
-test_img = Image.open('IMG_0283.jpg')
+test_img = Image.open('result.png')
+test_img_small = test_img.resize((300, int(300/test_img.size[0]*test_img.size[1])))
 test_img_reverse = PIL.ImageOps.invert(test_img)
 
 #qr_reader(qr_decoder(test_img, "RED_BSHUFFLE"))

@@ -35,6 +35,31 @@ def onbasis(seed_vector):
 
     return [u1, u2, u3]
 
+def random_normalbasis(min_dist):
+
+    u1 = np.array([random.randint(-255,255), random.randint(-255,255), random.randint(-255,255)])
+    u1 = u1 / np.linalg.norm(u1)
+    
+    while True:
+        u2 = np.array([random.randint(-255,255), random.randint(-255,255), random.randint(-255,255)])
+        u2 = u2 / np.linalg.norm(u2)
+        if np.linalg.norm(u1-u2) < min_dist:
+            break
+
+    while True:
+        u3 = np.array([random.randint(-255,255), random.randint(-255,255), random.randint(-255,255)])
+        u3 = u3 / np.linalg.norm(u3)
+        if np.linalg.norm(u1-u3) < min_dist and np.linalg.norm(u2-u3) < min_dist:
+            break
+
+    return [u1, u2, u3]
+
+def noise(amplitude):
+    n1 = random.random() * amplitude
+    n2 = random.random() * amplitude
+    n3 = random.random() * amplitude
+    return [n1, n2, n3]
+
 def transform_vector(vector, onbasis):
     x1 = np.dot(vector, onbasis[0])
     x2 = np.dot(vector, onbasis[1])
@@ -129,9 +154,60 @@ def qr_encrypt(img, enc):
                     
                     for k in range(100):
                         new_img.putpixel((i*10+int(k/10),j*10+k%10), tuple(new_pixel))
-    elif enc == "RANDOM_BSHUFFLE":
+    elif enc == "RANDOMON_BSHUFFLE":    # uses o.n.basis
         norm = np.linalg.norm(np.array([1,1]))
         basis = random_onbasis()
+        print(basis)
+        adjust = 220
+        for i in range(round(new_img.size[0]/10)):
+            for j in range(round(new_img.size[1]/10)):
+                r, g, b = new_img.getpixel((i*10, j*10))
+                if (r, g, b) == (0, 0, 0):
+                    new_pixel = np.array(invtransform_vector((127, random.randint(-127,127), random.randint(-127,127)), (basis)))
+                    new_pixel = new_pixel / adjust * 127
+                    new_pixel = new_pixel + 127
+                    new_pixel = new_pixel.astype(int)
+                    
+                    for k in range(100):
+                        new_img.putpixel((i*10+int(k/10),j*10+k%10), tuple(new_pixel))
+                else:
+                    new_pixel = np.array(invtransform_vector((-127, random.randint(-127,127), random.randint(-127,127)), (basis)))
+                    new_pixel = new_pixel / adjust * 255
+                    new_pixel = new_pixel / 2 + 127
+                    new_pixel = new_pixel.astype(int)
+
+                    for k in range(100):
+                        new_img.putpixel((i*10+int(k/10),j*10+k%10), tuple(new_pixel))
+    elif enc == "RANDOMON_BSHUFFLEv2":  # uses o.n.basis + noise
+        norm = np.linalg.norm(np.array([1,1]))
+        basis = random_onbasis()
+        amplitude = 0.2
+        basis = basis + noise(amplitude)
+        print(basis)
+        adjust = 220
+        for i in range(round(new_img.size[0]/10)):
+            for j in range(round(new_img.size[1]/10)):
+                r, g, b = new_img.getpixel((i*10, j*10))
+                if (r, g, b) == (0, 0, 0):
+                    new_pixel = np.array(invtransform_vector((127, random.randint(-127,127), random.randint(-127,127)), (basis)))
+                    new_pixel = new_pixel / adjust * 127
+                    new_pixel = new_pixel + 127
+                    new_pixel = new_pixel.astype(int)
+                    
+                    for k in range(100):
+                        new_img.putpixel((i*10+int(k/10),j*10+k%10), tuple(new_pixel))
+                else:
+                    new_pixel = np.array(invtransform_vector((-127, random.randint(-127,127), random.randint(-127,127)), (basis)))
+                    new_pixel = new_pixel / adjust * 255
+                    new_pixel = new_pixel / 2 + 127
+                    new_pixel = new_pixel.astype(int)
+
+                    for k in range(100):
+                        new_img.putpixel((i*10+int(k/10),j*10+k%10), tuple(new_pixel))
+    elif enc == "RANDOM_BSHUFFLE":  # uses any basis
+        basis = random_normalbasis(0.5)
+        amplitude = 0.2
+        #basis = basis + noise(amplitude)
         print(basis)
         adjust = 220
         for i in range(round(new_img.size[0]/10)):
@@ -162,4 +238,4 @@ def qr_encrypt(img, enc):
 
     return new_img
 
-qr = qr_gen("!qi23/DUTBlaSDFG+*2^sdnfB042*@0hDVB9MHzSdf##xf9*/0n9j5%MFMqm;n")
+qr = qr_gen("https://www.github.com/ckswjd99")
